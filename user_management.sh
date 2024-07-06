@@ -64,17 +64,40 @@ list_groups() {
 # Function to modify user
 modify_user() {
     read -p "Enter username to modify: " USERNAME
-    list_groups
-    read -p "Enter new group name: " NEW_GROUPNAME
+    
+    echo "1. Change Username"
+    echo "2. Change Password"
+    echo "3. Change Group"
+    read -p "Choose an option: " MODIFY_OPTION
 
-    # Check if group exists
-    if ! getent group "$NEW_GROUPNAME" > /dev/null; then
-        echo "Group $NEW_GROUPNAME does not exist. Please create it first."
-        return
-    fi
+    case $MODIFY_OPTION in
+        1)
+            read -p "Enter new username: " NEW_USERNAME
+            sudo usermod -l "$NEW_USERNAME" "$USERNAME"
+            echo "Username changed from $USERNAME to $NEW_USERNAME."
+            USERNAME=$NEW_USERNAME
+            ;;
+        2)
+            sudo passwd "$USERNAME"
+            echo "Password for $USERNAME has been changed."
+            ;;
+        3)
+            list_groups
+            read -p "Enter new group name: " NEW_GROUPNAME
 
-    sudo usermod -g "$NEW_GROUPNAME" "$USERNAME"
-    echo "User $USERNAME's group changed to $NEW_GROUPNAME."
+            # Check if group exists
+            if ! getent group "$NEW_GROUPNAME" > /dev/null; then
+                echo "Group $NEW_GROUPNAME does not exist. Please create it first."
+                return
+            fi
+
+            sudo usermod -g "$NEW_GROUPNAME" "$USERNAME"
+            echo "User $USERNAME's group changed to $NEW_GROUPNAME."
+            ;;
+        *)
+            echo "Invalid option. Please try again."
+            ;;
+    esac
 }
 
 # Function to monitor user activity
