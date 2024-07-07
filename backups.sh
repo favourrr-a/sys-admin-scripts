@@ -5,7 +5,7 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
-if ! command -v rsync &> /dev/null; then
+if ! command -v rsync > /dev/null 2>&1; then
     echo "rsync command not found"
     exit 2
 fi
@@ -22,7 +22,7 @@ fi
 
 rsync_options="-avb --backup-dir $2/$current_date --delete "
 
-$(which rsync) $rsync_options $1 $2/current >> $backup_log
+$(which rsync) $rsync_options $1 $2/current-$current_date >> $backup_log
 
 tar -czf $backup_file $1 
 
