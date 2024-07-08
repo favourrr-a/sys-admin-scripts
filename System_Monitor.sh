@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LOG_FILE="system_monitor.log"
-MONITOR_DURATION=3600  # Default monitoring duration (1 hour)
+MONITOR_DURATION=20  # Default monitoring duration (1 hour)
 
 function display_menu() {
     echo "System Monitoring Menu:"
@@ -38,18 +38,27 @@ function view_log_file() {
 
 # Function for continuous monitoring
 function monitor_resources() {
-    end=$((SECONDS+$MONITOR_DURATION))
+    end=$((SECONDS + $MONITOR_DURATION))
 
-    printf "Time\t\tMemory\t\tDisk\t\tCPU\n"  # Header
+    printf "%-20s %-10s %-10s %s\n" "Timestamp" "Memory" "Disk" "CPU"
+    echo   "--------------------------------------------------------"
 
     while [ $SECONDS -lt $end ]; do
         timestamp=$(date "+%Y-%m-%d %H:%M:%S")
         MEMORY=$(get_memory_usage)
         DISK=$(get_disk_usage)
         CPU=$(get_cpu_usage)
-        echo "$timestamp\t$MEMORY\t$DISK\t$CPU"
+
+        # Clear the current line and move cursor to beginning
+        tput cuu1 && tput el 
+
+        # Print updated values with consistent formatting
+        printf "%-20s %-10s %-10s %s\n" "$timestamp" "$MEMORY" "$DISK" "$CPU"
         sleep 5
     done
+
+    echo "-----------------------------------------------------------"
+    printf "\nMonitoring complete.\n"
 }
 
 # Function to change monitoring duration
